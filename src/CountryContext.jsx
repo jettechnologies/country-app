@@ -36,6 +36,7 @@ useEffect(() => {
         if (!localStorageData){
             const result = await fetchDataAndDispatch();
             const resultObj = {theme: state.theme , countries: result}
+            console.log(resultObj);
 
             setItem(resultObj);
         } 
@@ -51,12 +52,15 @@ useEffect(() => {
 
 useEffect(() =>{
     let localStorageData = window.localStorage.getItem("countries");
-        localStorageData = JSON.parse(localStorageData);    
+        localStorageData = JSON.parse(localStorageData);  
+        console.log(localStorageData);
+
     
     let dataDelay;
 
     if(localStorageData){
         const {theme, countries} = localStorageData;
+
 
         dispatch({
             type: "UPDATE_THEME",
