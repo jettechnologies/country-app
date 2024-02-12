@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useReducer, useEffect, useMemo} from "react";
+import { data } from "./data";
 import { nanoid } from "nanoid";
-import axios from "axios";
 import countryReducer, {intialState} from "./countryReducer";
 import { useLocalStorage } from "./useLocalStorage";
 
@@ -12,49 +12,29 @@ export const CountryProvider = ({children}) =>{
     const [state, dispatch] = useReducer(countryReducer, intialState);
     const { setItem } = useLocalStorage("countries");
 
-    const fetchData = async() =>{
-        const response = await axios.get("../data.json");
-        return response.data;
-    }
+useEffect(() =>{
+    let localStorageData = window.localStorage.getItem("countries");
+    localStorageData = JSON.parse(localStorageData);  
 
-    // i had to create an async function that would resolve the promise and set the data
-    const fetchDataAndDispatch = useCallback(async () => {
-        const result = await fetchData();
-        const updatedResult = result.map(data => {
+    if(!localStorageData){
+        const updatedResult = data.map(data => {
             data.id = nanoid();
             return data;
         });
-        return updatedResult;
-
-    }, []);
-
-useEffect(() => {
-    const dispatchResult = async () => {
-        let localStorageData = window.localStorage.getItem("countries");
-        localStorageData = JSON.parse(localStorageData);
-
-        if (!localStorageData){
-            const result = await fetchDataAndDispatch();
-            const resultObj = {theme: state.theme , countries: result}
-            console.log(resultObj);
-
-            setItem(resultObj);
-        } 
-        else{
-            setItem(localStorageData);
-        }
+        console.log(updatedResult);
+        const resultObj = {theme: state.theme , countries: updatedResult}
+        console.log(resultObj);
         
-    };
-
-    dispatchResult();
-}, [fetchDataAndDispatch, setItem, state.theme]);
-
+        setItem(resultObj);
+     }
+     else{
+        setItem(localStorageData);
+     }
+}, [setItem, state.theme]);
 
 useEffect(() =>{
     let localStorageData = window.localStorage.getItem("countries");
         localStorageData = JSON.parse(localStorageData);  
-        console.log(localStorageData);
-
     
     let dataDelay;
 
@@ -91,6 +71,8 @@ useEffect(() =>{
     
      return () => clearTimeout(dataDelay)    
 },[]);
+
+
 
     // updating the theme for the project
 const updateTheme = useCallback(() =>{
@@ -181,7 +163,6 @@ const updateLoading = useCallback((loadState) =>{
         loading: state.loading,
         search: state.countrySearch,
         regionSearch: state.countryRegion,
-        fetchDataAndDispatch,
         updateLoading,
         updateTheme,
         updateSearch,
