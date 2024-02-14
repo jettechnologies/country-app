@@ -86,7 +86,10 @@ select > option:focus{
 }
 
 .pagination-container{
+  width:100%;
   display: flex;
+  flex-wrap:wrap;
+  row-gap:1rem;
   list-style-type: none;
 }
 .pagination-item{
